@@ -239,6 +239,8 @@ INSERT INTO asiste (idAsistente, idEvento, idEntrada, valoracion)
 VALUES ('A04', 'E03', 'T04', '5');
 INSERT INTO asiste (idAsistente, idEvento, idEntrada, valoracion)
 VALUES ('A05', 'E04', 'T05', '4');
+INSERT INTO asiste (idAsistente, idEvento, idEntrada, valoracion)
+VALUES ('A05', 'E02', 'T06', '2');
 
 
 
