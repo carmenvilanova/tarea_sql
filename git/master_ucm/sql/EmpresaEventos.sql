@@ -1,9 +1,23 @@
+/* 
+
+	Proyecto final: Creación de una base de datos
+	Autora: Carmen Vilanova de Diego
+*/
+-- Eliminamos la base de datos en caso de existir
 DROP DATABASE IF EXISTS empresaEventos;
 
+-- Creamos la base de datos
 CREATE DATABASE empresaEventos;
 USE empresaEventos;
 
+
 /*Creación de tablas */
+-- Eliminamos las tablas en caso de existir
+DROP TABLE IF EXISTS actividad;
+DROP TABLE IF EXISTS artista;
+DROP TABLE IF EXISTS evento;
+DROP TABLE IF EXISTS ubicacion;
+DROP TABLE IF EXISTS asistente;
 
 CREATE TABLE actividad (
    idActividad char(3),
@@ -56,7 +70,7 @@ CREATE TABLE asistente (
    idAsistente char(3),
    nombreA varchar(40) not null,
    email varchar(40) not null,
-   telefono char(8),
+   telefono char(9),
    PRIMARY KEY(idAsistente)
 );
 
@@ -70,14 +84,13 @@ CREATE TABLE asiste (
    FOREIGN KEY(idEvento) REFERENCES evento(idEvento) ON DELETE cascade
 );
 
+    -- Trigger para calcular la suma de los cachés de los artistas involucrados en la actividad
 DELIMITER $$
 CREATE TRIGGER calcular_coste_actividad
 AFTER INSERT ON actividad_artista
 FOR EACH ROW
 BEGIN
     DECLARE totalCoste DECIMAL(10,2);
-
-    -- Calcular la suma de los cachés de los artistas involucrados en la actividad
     SELECT SUM(a.cacheArt) INTO totalCoste
     FROM artista a
     JOIN actividad_artista aa ON a.idArtista = aa.idArtista
@@ -127,6 +140,7 @@ IF current_asistentes >= max_aforo THEN
 END$$
 DELIMITER ;
 
+-- Se insertan los datos en las tablas
 
 INSERT INTO actividad (idActividad, nombre, tipo, coste)
 VALUES ('001', 'Concierto de rock', 'Concierto', 0);
@@ -240,7 +254,10 @@ VALUES ('A04', 'E03', 'T04', '5');
 INSERT INTO asiste (idAsistente, idEvento, idEntrada, valoracion)
 VALUES ('A05', 'E04', 'T05', '4');
 INSERT INTO asiste (idAsistente, idEvento, idEntrada, valoracion)
+<<<<<<< HEAD
+VALUES ('A05', 'E04', 'T05', '4');
+=======
 VALUES ('A05', 'E02', 'T06', '2');
+>>>>>>> 99fae3ffc41cc6a93517e3a23d20e42d5aaf8960
 
-
-
+-- CONSULTAS -- 
