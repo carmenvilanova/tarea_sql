@@ -69,8 +69,14 @@ CREATE TABLE asistente (
    idAsistente char(3),
    nombreA varchar(40) not null,
    email varchar(40) not null,
-   telefono char(9),
    PRIMARY KEY(idAsistente)
+);
+
+CREATE TABLE telefono (
+idAsistente char(3),
+telefono1 char(9),
+telefono2 char(9),
+PRIMARY key(idAsistente)
 );
 
 CREATE TABLE asiste (
