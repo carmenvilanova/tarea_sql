@@ -31,13 +31,13 @@ CREATE TABLE artista (
    idArtista char(3),
    nombreArt varchar(40) not null,
    biografia varchar(400) not null,
-   cacheArt DECIMAL(10,2),
    PRIMARY KEY(idArtista)
 );
 
 CREATE TABLE actividad_artista (
    idArtista char(3),
    idActividad char(3),
+   cacheArt DECIMAL(10,2),
    PRIMARY KEY(idArtista, idActividad),
    FOREIGN KEY(idArtista) REFERENCES artista(idArtista) ON DELETE cascade,   
    FOREIGN KEY(idActividad) REFERENCES actividad(idActividad) ON DELETE cascade
@@ -60,7 +60,6 @@ CREATE TABLE evento (
    idActividad char(3),
    nombreUbi varchar(40) not null,
    precio_entrada DECIMAL (10,2),
-   num_asistentes INT,
    PRIMARY KEY(idEvento),
    FOREIGN KEY (idUbicacion) references ubicacion(idUbicacion),
    FOREIGN KEY (idActividad) references actividad(idActividad)
@@ -91,7 +90,7 @@ AFTER INSERT ON actividad_artista
 FOR EACH ROW
 BEGIN
     DECLARE totalCoste DECIMAL(10,2);
-    SELECT SUM(a.cacheArt) INTO totalCoste
+    SELECT SUM(aa.cacheArt) INTO totalCoste
     FROM artista a
     JOIN actividad_artista aa ON a.idArtista = aa.idArtista
     WHERE aa.idActividad = NEW.idActividad;
@@ -102,23 +101,6 @@ BEGIN
     WHERE idActividad = NEW.idActividad;
 END$$
 DELIMITER ;
-
--- trigger para ir sumando asistentes
-CREATE TRIGGER NumAsistentesAI AFTER INSERT
-ON asiste
-FOR EACH ROW
-UPDATE evento
-SET num_asistentes = num_asistentes+1
-WHERE new.idEvento = idEvento;
-
--- trigger para ir eliminando asistentes
-CREATE TRIGGER NumAsistentesAD AFTER DELETE
-ON asiste
-FOR EACH ROW
-UPDATE evento
-SET num_asistentes = num_asistentes-1
-WHERE old.idEvento = idEvento;
-
 /
 -- trigger para comprobar aforo
 DELIMITER $$
@@ -141,6 +123,5 @@ END$$
 DELIMITER ;
 
 -- Se insertan los datos en las tablas
-
 
 -- CONSULTAS -- 
