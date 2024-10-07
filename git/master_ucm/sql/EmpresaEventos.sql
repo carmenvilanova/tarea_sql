@@ -34,20 +34,11 @@ CREATE TABLE artista (
    PRIMARY KEY(idArtista)
 );
 
-CREATE TABLE actividad_artista (
-   idArtista INT AUTO_iNCREMENT,
-   idActividad INT,
-   cacheArt DECIMAL(10,2),
-   PRIMARY KEY(idArtista, idActividad),
-   FOREIGN KEY(idArtista) REFERENCES artista(idArtista) ON DELETE cascade,   
-   FOREIGN KEY(idActividad) REFERENCES actividad(idActividad) ON DELETE cascade
-);
-
 CREATE TABLE ubicacion (
    idUbicacion INT AUTO_iNCREMENT,
    nombreUbi varchar(40) not null,
    direccion varchar(40) not null,
-   tipo varchar(40) not null, /* solo puede ser ciudad o pueblo*/
+   tipo varchar(40) not null CHECK (tipo IN ('ciudad', 'pueblo')), /* solo puede ser ciudad o pueblo*/
    caracteristica varchar(40) not null,
    aforo char(5),
    PAlquiler char(5),
@@ -58,8 +49,9 @@ CREATE TABLE evento (
    idEvento INT AUTO_iNCREMENT,
    idUbicacion INT,
    idActividad INT,
-   nombreUbi varchar(40) not null,
    precio_entrada DECIMAL (10,2),
+   fecha DATE not null,
+   hora TIME not null,
    PRIMARY KEY(idEvento),
    FOREIGN KEY (idUbicacion) references ubicacion(idUbicacion),
    FOREIGN KEY (idActividad) references actividad(idActividad)
@@ -80,12 +72,20 @@ telefono2 char(9),
 PRIMARY key(idAsistente)
 );
 
+CREATE TABLE actividad_artista (
+   idArtista INT AUTO_iNCREMENT,
+   idActividad INT,
+   cacheArt DECIMAL(10,2),
+   PRIMARY KEY(idArtista, idActividad),
+   FOREIGN KEY(idArtista) REFERENCES artista(idArtista) ON DELETE cascade,   
+   FOREIGN KEY(idActividad) REFERENCES actividad(idActividad) ON DELETE cascade
+);
+
 CREATE TABLE asiste (
    idAsistente INT,
    idEvento INT,
-   idEntrada INT,
    valoracion INT CHECK (valoracion >= 0 AND valoracion <= 5),  -- Restricción para valores enteros entre 0 y 5
-   PRIMARY KEY(idAsistente, idEvento, idEntrada)
+   PRIMARY KEY(idAsistente, idEvento)
 );
 
 
@@ -198,18 +198,6 @@ VALUES
 ('Anfiteatro al Aire Libre', 'Parque del Sol, s/n', 'ciudad', 'Vista panorámica', '180', '3500'),
 ('Casa de la Cultura', 'Av. Central, 12', 'pueblo', 'Lugar comunitario', '40', '800');
 
-INSERT INTO evento (idUbicacion, idActividad, nombreUbi, precio_entrada)
-VALUES
-(1, 1, 'Auditorio Nacional', 75.00),  -- Concierto de Jazz en Auditorio Nacional
-(2, 2, 'Teatro Real', 50.00),         -- Exposición de Arte en Teatro Real
-(3, 3, 'Sala Luna', 100.00),          -- Conferencia de IA en Sala Luna
-(4, 4, 'Parque Central', 30.00),      -- Obra de Teatro Clásico en Parque Central
-(5, 5, 'Plaza Mayor', 0.00),          -- Concierto de Música Clásica en Plaza Mayor
-(6, 6, 'Museo del Arte', 20.00),      -- Conferencia Economía Circular en Museo del Arte
-(7, 7, 'Centro de Convenciones', 90.00), -- Concierto de Rock and Roll en Centro de Convenciones
-(8, 8, 'Teatro del Pueblo', 40.00),   -- Exposición Fotográfica en Teatro del Pueblo
-(9, 9, 'Anfiteatro al Aire Libre', 70.00), -- Concierto de Blues en Anfiteatro al Aire Libre
-(10, 10, 'Casa de la Cultura', 15.00); -- Obra de Teatro Musical en Casa de la Cultura
 
 INSERT INTO asistente (nombreAs, apellidoAs, email)
 VALUES
@@ -237,17 +225,31 @@ VALUES
 (9, '690901234', '600432109'),  -- José Pérez
 (10, '600012345', NULL);        -- Lucía Romero (solo un número)
 
-INSERT INTO asiste (idAsistente, idEvento, idEntrada, valoracion)
+INSERT INTO evento (idUbicacion, idActividad, precio_entrada, fecha, hora)
 VALUES
-(1, 1, 101, 5),  -- Carlos García asistió al Concierto de Jazz y le dio una valoración de 5
-(2, 2, 102, 4),  -- María López asistió a la Exposición de Arte Contemporáneo y le dio una valoración de 4
-(3, 3, 103, 2),  -- Luis Martínez asistió a la Conferencia sobre IA y le dio una valoración de 2
-(4, 4, 104, 3),  -- Ana Sánchez asistió a la Obra de Teatro Clásico y le dio una valoración de 3
-(5, 5, 105, 4),  -- Pedro Fernández asistió al Concierto de Música Clásica y le dio una valoración de 4
-(6, 6, 106, 5),  -- Laura Gómez asistió a la Conferencia sobre Economía Circular y le dio una valoración de 5
-(7, 7, 107, 1),  -- Javier Díaz asistió al Concierto de Rock and Roll y le dio una valoración de 1
-(8, 8, 108, 3),  -- Carmen Ruiz asistió a la Exposición Fotográfica y le dio una valoración de 3
-(9, 9, 109, 4),  -- José Pérez asistió al Concierto de Blues y le dio una valoración de 4
-(10, 10, 110, 0); -- Lucía Romero asistió a la Obra de Teatro Musical y le dio una valoración de 0
+    (1, 1, 100.00, '2024-10-10', '18:00:00'),  -- Evento 1
+    (2, 2, 50.00, '2024-10-11', '15:30:00'),   -- Evento 2
+    (3, 3, 75.00, '2024-10-12', '20:00:00'),   -- Evento 3
+    (4, 4, 120.00, '2024-10-13', '19:00:00'),  -- Evento 4
+    (5, 5, 30.00, '2024-10-14', '14:00:00'),   -- Evento 5
+    (1, 6, 25.00, '2024-10-15', '16:00:00'),   -- Evento 6
+    (2, 7, 80.00, '2024-10-16', '19:30:00'),   -- Evento 7
+    (3, 8, 55.00, '2024-10-17', '17:00:00'),   -- Evento 8
+    (4, 9, 105.00, '2024-10-18', '20:30:00'),  -- Evento 9
+    (5, 10, 40.00, '2024-10-19', '13:30:00');  -- Evento 10
+
+INSERT INTO asiste (idAsistente, idEvento, valoracion)
+VALUES
+    (1, 1, 4),
+    (2, 2, 5),
+    (3, 3, 3),
+    (4, 4, 2),
+    (5, 5, 5),
+    (1, 6, 0),
+    (2, 7, 1),
+    (3, 8, 4),
+    (4, 9, 3),
+    (5, 10, 5);
 
 -- CONSULTAS -- 
+
