@@ -49,6 +49,7 @@ CREATE TABLE evento (
    idEvento INT AUTO_iNCREMENT,
    idUbicacion INT,
    idActividad INT,
+   nombreEvento varchar(80) not null,
    precio_entrada DECIMAL (10,2),
    fecha DATE not null,
    hora TIME not null,
@@ -187,7 +188,7 @@ VALUES
 
 INSERT INTO ubicacion (nombreUbi, direccion, tipo, caracteristica, aforo, PAlquiler)
 VALUES
-('Auditorio Nacional', 'Calle Príncipe, 44', 'ciudad', 'Acústica excelente', '2', '5000'),
+('Auditorio Nacional', 'Calle Príncipe, 44', 'ciudad', 'Acústica excelente', '10', '5000'),
 ('Teatro Real', 'Plaza de Oriente, s/n', 'ciudad', 'Teatro histórico', '15', '4000'),
 ('Sala Luna', 'Calle Luna, 14', 'ciudad', 'Sala moderna', '50', '1500'),
 ('Parque Central', 'Av. Libertad, 101', 'pueblo', 'Espacio al aire libre', '30', '2500'),
@@ -225,31 +226,84 @@ VALUES
 (9, '690901234', '600432109'),  -- José Pérez
 (10, '600012345', NULL);        -- Lucía Romero (solo un número)
 
-INSERT INTO evento (idUbicacion, idActividad, precio_entrada, fecha, hora)
-VALUES
-    (1, 1, 100.00, '2024-10-10', '18:00:00'),  -- Evento 1
-    (2, 2, 50.00, '2024-10-11', '15:30:00'),   -- Evento 2
-    (3, 3, 75.00, '2024-10-12', '20:00:00'),   -- Evento 3
-    (4, 4, 120.00, '2024-10-13', '19:00:00'),  -- Evento 4
-    (5, 5, 30.00, '2024-10-14', '14:00:00'),   -- Evento 5
-    (1, 6, 25.00, '2024-10-15', '16:00:00'),   -- Evento 6
-    (2, 7, 80.00, '2024-10-16', '19:30:00'),   -- Evento 7
-    (3, 8, 55.00, '2024-10-17', '17:00:00'),   -- Evento 8
-    (4, 9, 105.00, '2024-10-18', '20:30:00'),  -- Evento 9
-    (5, 10, 40.00, '2024-10-19', '13:30:00');  -- Evento 10
+INSERT INTO evento (idUbicacion, idActividad, nombreEvento, precio_entrada, fecha, hora)
+VALUES 
+(3, 1, 'Concierto de Jazz en la Sala Luna', 20.00, '2024-10-15', '19:30:00'),
+(5, 8, 'Exposición de Fotografía en la Plaza Mayor', 20.00, '2024-10-15', '17:00:00'),
+(2, 4, 'Teatro Clásico en el Teatro Real', 20.00, '2024-10-16', '20:00:00'),
+(4, 10, 'Concierto de Blues al Aire Libre', 20.00, '2024-10-16', '18:30:00'),
+(7, 3, 'Conferencia sobre IA en el Centro de Convenciones', 20.00, '2024-10-17', '10:00:00'),
+(8, 9, 'Musical en el Anfiteatro al Aire Libre', 20.00, '2024-10-17', '17:00:00'),
+(1, 6, 'Economía Circular en el Auditorio Nacional', 20.00, '2024-10-18', '09:00:00'),
+(10, 2, 'Exposición de Arte en la Casa de la Cultura', 20.00, '2024-10-18', '12:30:00'),
+(6, 7, 'Concierto de Rock en el Museo del Arte', 20.00, '2024-10-19', '20:00:00'),
+(9, 5, 'Concierto de Música Clásica en el Teatro del Pueblo', 20.00, '2024-10-19', '21:30:00'),
+(4, 10, 'Blues al Aire Libre en el Parque Central', 20.00, '2024-10-20', '11:00:00'),
+(3, 1, 'Matinal de Jazz en la Sala Luna', 20.00, '2024-10-20', '14:00:00'),
+(7, 4, 'Hamlet en el Centro de Convenciones', 20.00, '2024-10-21', '19:00:00'),
+(9, 6, 'Foro de Economía Circular en el Teatro del Pueblo', 20.00, '2024-10-21', '15:00:00'),
+(8, 5, 'Concierto Clásico en el Anfiteatro al Aire Libre', 20.00, '2024-10-22', '20:30:00'),
+(5, 2, 'Arte Moderno en la Plaza Mayor', 20.00, '2024-10-22', '16:00:00'),
+(2, 7, 'Concierto de Rock en el Teatro Real', 20.00, '2024-10-23', '21:00:00'),
+(6, 9, 'Musical en el Museo del Arte', 20.00, '2024-10-23', '18:00:00'),
+(10, 8, 'Fotografía Urbana en la Casa de la Cultura', 20.00, '2024-10-24', '10:00:00'),
+(1, 3, 'Conferencia IA en el Auditorio Nacional', 20.00, '2024-10-24', '09:30:00');
 
-INSERT INTO asiste (idAsistente, idEvento, valoracion)
-VALUES
-    (1, 1, 4),
-    (2, 2, 5),
-    (3, 3, 3),
-    (4, 4, 2),
-    (5, 5, 5),
-    (1, 6, 0),
-    (2, 7, 1),
-    (3, 8, 4),
-    (4, 9, 3),
-    (5, 10, 5);
+INSERT INTO asiste (idAsistente, idEvento, valoracion) 
+VALUES 
+(1, 1, 5),
+(1, 5, 4),
+(1, 7, 5),
+(1, 10, 4),
+(1, 11, 3),  
+(2, 2, 3),
+(2, 8, 4),
+(2, 12, 2),
+(2, 19, 3),
+(2, 20, 1), 
+(3, 3, 2),
+(3, 6, 3),
+(3, 13, 1),
+(4, 4, 1),
+(4, 9, 2),
+(4, 14, 0),
+(5, 5, 5),
+(5, 9, 4),
+(5, 15, 5),
+(6, 7, 5),
+(6, 10, 4),
+(6, 16, 5),
+(7, 2, 4),
+(7, 8, 3),
+(7, 12, 3),
+(7, 15, 2),
+(8, 9, 4),
+(8, 14, 5),
+(8, 20, 3),
+(9, 3, 2),
+(9, 6, 1),
+(10, 4, 3),
+(10, 10, 2),
+(10, 16, 4);
 
 -- CONSULTAS -- 
 
+# Eventos que se han realizado por tipo de actividad
+
+# Número de eventos de cada actividad
+
+# Actividades con un solo artista
+
+# Ciudad en la que sólo se han realizado eventos de teatro
+
+# Eventos con más ceros en su valoración
+
+# Asistente que puntúa más alto y más bajo
+
+# Día en la que más asistentes ha habido
+
+# left join
+
+# right join
+
+# vista
