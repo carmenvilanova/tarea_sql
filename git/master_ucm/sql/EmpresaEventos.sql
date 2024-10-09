@@ -39,6 +39,7 @@ CREATE TABLE ubicacion (
    nombreUbi varchar(40) not null,
    direccion varchar(40) not null,
    tipo varchar(40) not null CHECK (tipo IN ('ciudad', 'pueblo')), /* solo puede ser ciudad o pueblo*/
+   poblacion varchar(40) not null,
    caracteristica varchar(40) not null,
    aforo char(5),
    PAlquiler char(5),
@@ -175,29 +176,29 @@ VALUES
 
 INSERT INTO actividad_artista (idArtista, idActividad, cacheArt)
 VALUES
-(1, 1, 5000.00),  -- Carlos Santana en Concierto de Jazz
-(2, 2, 3000.00),  -- Pablo Picasso en Exposición de Arte Contemporáneo
-(3, 3, 15000.00), -- Beyoncé en Conferencia sobre Inteligencia Artificial
-(4, 4, 2000.00),  -- Frida Kahlo en Obra de Teatro Clásico
-(5, 1, 8000.00),  -- Miles Davis en Concierto de Jazz
-(6, 5, 10000.00), -- Adele en Concierto de Música Clásica
+(1, 1, 500.00),  -- Carlos Santana en Concierto de Jazz
+(2, 2, 300.00),  -- Pablo Picasso en Exposición de Arte Contemporáneo
+(3, 3, 150.00), -- Beyoncé en Conferencia sobre Inteligencia Artificial
+(4, 4, 200.00),  -- Frida Kahlo en Obra de Teatro Clásico
+(5, 1, 800.00),  -- Miles Davis en Concierto de Jazz
+(6, 5, 1000.00), -- Adele en Concierto de Música Clásica
 (7, 2, 0.00),     -- Vincent van Gogh en Exposición de Arte Contemporáneo (sin caché)
-(8, 6, 6000.00),  -- John Coltrane en Conferencia sobre Economía Circular
-(9, 7, 12000.00), -- Lady Gaga en Concierto de Rock and Roll
-(10, 9, 3000.00); -- Diego Rivera en Obra de Teatro Musical
+(8, 6, 600.00),  -- John Coltrane en Conferencia sobre Economía Circular
+(9, 7, 120.00), -- Lady Gaga en Concierto de Rock and Roll
+(10, 9, 300.00); -- Diego Rivera en Obra de Teatro Musical
 
-INSERT INTO ubicacion (nombreUbi, direccion, tipo, caracteristica, aforo, PAlquiler)
+INSERT INTO ubicacion (nombreUbi, direccion, tipo, caracteristica, aforo, PAlquiler, poblacion)
 VALUES
-('Auditorio Nacional', 'Calle Príncipe, 44', 'ciudad', 'Acústica excelente', '10', '5000'),
-('Teatro Real', 'Plaza de Oriente, s/n', 'ciudad', 'Teatro histórico', '15', '4000'),
-('Sala Luna', 'Calle Luna, 14', 'ciudad', 'Sala moderna', '50', '1500'),
-('Parque Central', 'Av. Libertad, 101', 'pueblo', 'Espacio al aire libre', '30', '2500'),
-('Plaza Mayor', 'Plaza Mayor, s/n', 'pueblo', 'Centro cultural', '12', '1000'),
-('Museo del Arte', 'Calle del Arte, 22', 'ciudad', 'Galería moderna', '10', '3000'),
-('Centro de Convenciones', 'Calle Mayor, 55', 'ciudad', 'Salón para eventos', '25', '4500'),
-('Teatro del Pueblo', 'Calle Libertad, 9', 'pueblo', 'Teatro tradicional', '80', '1200'),
-('Anfiteatro al Aire Libre', 'Parque del Sol, s/n', 'ciudad', 'Vista panorámica', '180', '3500'),
-('Casa de la Cultura', 'Av. Central, 12', 'pueblo', 'Lugar comunitario', '40', '800');
+('Auditorio Nacional', 'Calle Príncipe, 44', 'ciudad', 'Acústica excelente', '10', '5000', 'Madrid'),
+('Teatro Real', 'Plaza de Oriente, s/n', 'ciudad', 'Teatro histórico', '15', '4000', 'Barcelona'),
+('Sala Luna', 'Calle Luna, 14', 'ciudad', 'Sala moderna', '50', '1500', 'Valencia'),
+('Parque Central', 'Av. Libertad, 101', 'pueblo', 'Espacio al aire libre', '30', '2500', 'San Pedrito'),
+('Plaza Mayor', 'Plaza Mayor, s/n', 'pueblo', 'Centro cultural', '12', '1000', 'El Rincón'),
+('Museo del Arte', 'Calle del Arte, 22', 'ciudad', 'Galería moderna', '10', '3000', 'Bilbao'),
+('Centro de Convenciones', 'Calle Mayor, 55', 'ciudad', 'Salón para eventos', '25', '4500', 'Sevilla'),
+('Teatro del Pueblo', 'Calle Libertad, 9', 'pueblo', 'Teatro tradicional', '80', '1200', 'Villa Esperanza'),
+('Anfiteatro al Aire Libre', 'Parque del Sol, s/n', 'ciudad', 'Vista panorámica', '180', '3500', 'Granada'),
+('Casa de la Cultura', 'Av. Central, 12', 'pueblo', 'Lugar comunitario', '40', '800', 'Pueblo Nuevo');
 
 
 INSERT INTO asistente (nombreAs, apellidoAs, email)
@@ -244,7 +245,6 @@ VALUES
 (9, 6, 'Foro de Economía Circular en el Teatro del Pueblo', 20.00, '2024-10-21', '15:00:00'),
 (8, 5, 'Concierto Clásico en el Anfiteatro al Aire Libre', 20.00, '2024-10-22', '20:30:00'),
 (5, 2, 'Arte Moderno en la Plaza Mayor', 20.00, '2024-10-22', '16:00:00'),
-(2, 7, 'Concierto de Rock en el Teatro Real', 20.00, '2024-10-23', '21:00:00'),
 (6, 9, 'Musical en el Museo del Arte', 20.00, '2024-10-23', '18:00:00'),
 (10, 8, 'Fotografía Urbana en la Casa de la Cultura', 20.00, '2024-10-24', '10:00:00'),
 (1, 3, 'Conferencia IA en el Auditorio Nacional', 20.00, '2024-10-24', '09:30:00');
@@ -267,7 +267,7 @@ VALUES
 (4, 4, 1),
 (4, 9, 2),
 (4, 14, 0),
-(5, 5, 5),
+(5, 5, 3),
 (5, 9, 4),
 (5, 15, 5),
 (6, 7, 5),
@@ -284,26 +284,84 @@ VALUES
 (9, 6, 1),
 (10, 4, 3),
 (10, 10, 2),
-(10, 16, 4);
+(10, 16, 4),
+(3, 2, 0),
+(9, 2, 0),
+(10, 8, 0);
 
 -- CONSULTAS -- 
 
-# Eventos que se han realizado por tipo de actividad
+# 1.Número de eventos de cada actividad
+select nombre, count(e.idEvento) numeroEventos
+from evento e
+inner join
+actividad a on e.idActividad = a.idActividad
+group by
+a.nombre;
 
-# Número de eventos de cada actividad
+# 2. Actividades con un solo artista
+select nombre, count(idArtista) as numeroArtistas
+from actividad_artista aa
+inner join
+actividad a on aa.idActividad = a.idActividad
+group by 
+a.idActividad
+having 
+numeroArtistas = 1;
 
-# Actividades con un solo artista
+# 3. Poblacion en la que sólo se han realizado eventos de teatro
+select u.poblacion
+from ubicacion u 
+inner join evento e on u.idUbicacion = e.idUbicacion
+inner join actividad a on e.idActividad = a.idActividad
+group by u.poblacion
+having count(distinct a.tipo) = 1 and max(a.tipo) = 'Teatro';
 
-# Ciudad en la que sólo se han realizado eventos de teatro
 
-# Eventos con más ceros en su valoración
+# 4. Eventos con más ceros en su valoración
+select nombreEvento, count(valoracion) as num_ceros
+from evento e
+inner join 
+asiste a on a.idEvento = e.idEvento
+where valoracion = 0
+group by nombreEvento
+order by num_ceros desc
+limit 1;
 
-# Asistente que puntúa más alto y más bajo
+# 5. Asistente que puntúa más alto
+-- Title: consulta5
+select idAsistente, avg(valoracion) as mediaValoracion
+from asiste
+group by idAsistente
+order by mediaValoracion desc
+limit 1;
 
-# Día en la que más asistentes ha habido
+# 6. Día en el que más asistentes ha habido
 
-# left join
+-- En primer lugar creamos la vista
+create view vista_asistentes_por_fecha as
+select e.fecha, count(distinct a.idAsistente) as totalAsistentes
+from evento e 
+inner join
+asiste a on e.idEvento = a.idEvento
+group by 
+e.fecha;
+-- Realizamos la consulta utilizando la vista
+select fecha, totalAsistentes
+from vista_asistentes_por_fecha
+order by
+totalAsistentes desc
+limit 1;
 
-# right join
+# 7. Obten el beneficio de cada evento
+select e.nombreEvento, 
+	(SUM(e.precio_entrada) - a.coste) as beneficios -- para calcular los beneficios sumamos el precio de las entradas vendidas y restamos el coste de la actividad
+from evento e
+inner join
+actividad a on  a.idActividad = e.idActividad
+inner join 
+asiste s on s.idEvento = e.idEvento
+group by e.nombreEvento, a.coste
+order by beneficios desc;
 
-# vista
+# 8. 
