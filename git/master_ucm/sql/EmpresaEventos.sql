@@ -18,6 +18,9 @@ DROP TABLE IF EXISTS artista;
 DROP TABLE IF EXISTS evento;
 DROP TABLE IF EXISTS ubicacion;
 DROP TABLE IF EXISTS asistente;
+DROP TABLE IF EXISTS telefono;
+DROP TABLE IF EXISTS asiste;
+DROP TABLE IF EXISTS actividad_artista;
 
 CREATE TABLE actividad (
    idActividad INT AUTO_iNCREMENT,
@@ -47,7 +50,7 @@ CREATE TABLE ubicacion (
 );
 
 CREATE TABLE evento (
-   idEvento INT AUTO_iNCREMENT,
+   idEvento INT AUTO_INCREMENT,
    idUbicacion INT,
    idActividad INT,
    nombreEvento varchar(80) not null,
@@ -71,11 +74,12 @@ CREATE TABLE telefono (
 idAsistente INT,
 telefono1 char(9),
 telefono2 char(9),
-PRIMARY key(idAsistente)
+PRIMARY key(idAsistente),
+FOREIGN KEY(idAsistente) REFERENCES asistente(idAsistente) ON DELETE cascade
 );
 
 CREATE TABLE actividad_artista (
-   idArtista INT AUTO_iNCREMENT,
+   idArtista INT,
    idActividad INT,
    cacheArt DECIMAL(10,2),
    PRIMARY KEY(idArtista, idActividad),
@@ -83,14 +87,15 @@ CREATE TABLE actividad_artista (
    FOREIGN KEY(idActividad) REFERENCES actividad(idActividad) ON DELETE cascade
 );
 
+
 CREATE TABLE asiste (
-   idAsistente INT,
-   idEvento INT,
-   valoracion INT CHECK (valoracion >= 0 AND valoracion <= 5),  -- Restricción para valores enteros entre 0 y 5
-   PRIMARY KEY(idAsistente, idEvento)
+   idAsistente INT not null,
+   idEvento INT not null,
+   valoracion INT CHECK (valoracion >= 0 AND valoracion <= 5),
+   PRIMARY KEY(idAsistente, idEvento),
+   FOREIGN KEY(idEvento) REFERENCES evento(idEvento) ON DELETE cascade,
+   FOREIGN KEY(idAsistente) REFERENCES asistente(idAsistente) ON DELETe cascade
 );
-
-
 
 -- Trigger para calcular la suma de los cachés de los artistas involucrados en la actividad
 DELIMITER $$
@@ -185,7 +190,9 @@ VALUES
 (7, 2, 0.00),     -- Vincent van Gogh en Exposición de Arte Contemporáneo (sin caché)
 (8, 6, 600.00),  -- John Coltrane en Conferencia sobre Economía Circular
 (9, 7, 120.00), -- Lady Gaga en Concierto de Rock and Roll
-(10, 9, 300.00); -- Diego Rivera en Obra de Teatro Musical
+(10, 9, 300.00),  -- Diego Rivera en Obra de Teatro Moderno
+(9, 1, 120.00), -- Lady Gaga en Concierto de Jazz
+(10, 4, 300.00); -- Diego Rivera en Obra de Teatro Clasico
 
 INSERT INTO ubicacion (nombreUbi, direccion, tipo, caracteristica, aforo, PAlquiler, poblacion)
 VALUES
@@ -292,76 +299,102 @@ VALUES
 -- CONSULTAS -- 
 
 # 1.Número de eventos de cada actividad
-select nombre, count(e.idEvento) numeroEventos
-from evento e
-inner join
-actividad a on e.idActividad = a.idActividad
-group by
+
+SELECT nombre, count(e.idEvento) numeroEventos
+FROM evento e
+INNER JOIN
+actividad a ON e.idActividad = a.idActividad
+GROUP BY
 a.nombre;
 
 # 2. Actividades con un solo artista
-select nombre, count(idArtista) as numeroArtistas
-from actividad_artista aa
-inner join
-actividad a on aa.idActividad = a.idActividad
-group by 
-a.idActividad
-having 
-numeroArtistas = 1;
+SELECT a.nombre, COUNT(aa.idArtista) AS numeroArtistas
+FROM actividad_artista aa
+INNER JOIN actividad a ON aa.idActividad = a.idActividad
+GROUP BY a.idActividad
+HAVING COUNT(aa.idArtista) = 1;
+
 
 # 3. Poblacion en la que sólo se han realizado eventos de teatro
-select u.poblacion
-from ubicacion u 
-inner join evento e on u.idUbicacion = e.idUbicacion
-inner join actividad a on e.idActividad = a.idActividad
-group by u.poblacion
-having count(distinct a.tipo) = 1 and max(a.tipo) = 'Teatro';
+SELECT u.poblacion
+FROM ubicacion u 
+INNER JOIN evento e ON u.idUbicacion = e.idUbicacion
+INNER JOIN actividad a ON e.idActividad = a.idActividad
+GROUP BY u.poblacion
+HAVING COUNT(DISTINCT a.tipo) = 1 AND MAX(a.tipo) = 'TEATRO';
 
 
 # 4. Eventos con más ceros en su valoración
-select nombreEvento, count(valoracion) as num_ceros
-from evento e
-inner join 
-asiste a on a.idEvento = e.idEvento
-where valoracion = 0
-group by nombreEvento
-order by num_ceros desc
-limit 1;
+SELECT nombreEvento, COUNT(valoracion) AS num_ceros
+FROM evento e
+INNER JOIN asiste a ON a.idEvento = e.idEvento
+WHERE valoracion = 0
+GROUP BY nombreEvento
+ORDER BY num_ceros DESC
+LIMIT 1;
+
 
 # 5. Asistente que puntúa más alto
--- Title: consulta5
-select idAsistente, avg(valoracion) as mediaValoracion
-from asiste
-group by idAsistente
-order by mediaValoracion desc
-limit 1;
+
+SELECT idAsistente, AVG(valoracion) AS mediaValoracion
+FROM asiste
+GROUP BY idAsistente
+ORDER BY mediaValoracion DESC
+LIMIT 1;
+
 
 # 6. Día en el que más asistentes ha habido
 
 -- En primer lugar creamos la vista
-create view vista_asistentes_por_fecha as
-select e.fecha, count(distinct a.idAsistente) as totalAsistentes
-from evento e 
-inner join
-asiste a on e.idEvento = a.idEvento
-group by 
-e.fecha;
+CREATE VIEW vista_asistentes_por_fecha AS
+SELECT e.fecha, COUNT(DISTINCT a.idAsistente) AS totalAsistentes
+FROM evento e 
+INNER JOIN asiste a ON e.idEvento = a.idEvento
+GROUP BY e.fecha;
+
+
 -- Realizamos la consulta utilizando la vista
-select fecha, totalAsistentes
-from vista_asistentes_por_fecha
-order by
-totalAsistentes desc
-limit 1;
+SELECT fecha, totalAsistentes
+FROM vista_asistentes_por_fecha
+ORDER BY totalAsistentes DESC
+LIMIT 1;
+
 
 # 7. Obten el beneficio de cada evento
-select e.nombreEvento, 
-	(SUM(e.precio_entrada) - a.coste) as beneficios -- para calcular los beneficios sumamos el precio de las entradas vendidas y restamos el coste de la actividad
-from evento e
-inner join
-actividad a on  a.idActividad = e.idActividad
-inner join 
-asiste s on s.idEvento = e.idEvento
-group by e.nombreEvento, a.coste
-order by beneficios desc;
+SELECT e.nombreEvento, 
+       (SUM(e.precio_entrada) - a.coste) AS beneficios -- para calcular los beneficios sumamos el precio de las entradas vendidas y restamos el coste de la actividad
+FROM evento e
+INNER JOIN actividad a ON a.idActividad = e.idActividad
+INNER JOIN asiste s ON s.idEvento = e.idEvento
+GROUP BY e.nombreEvento, a.coste
+ORDER BY beneficios DESC;
 
-# 8. 
+# 8. Artistas que han participado en más de una actividad
+-- Para esta consulta utilizamos IN para generar una subconsulta
+
+SELECT ar.nombreArt
+FROM artista ar
+WHERE ar.idArtista IN (
+    SELECT aa.idArtista
+    FROM actividad_artista aa
+    GROUP BY aa.idArtista
+    HAVING COUNT(aa.idActividad) > 1
+);
+
+
+# 9. Lista de todos los eventos con su ubicacion y total de ingresos generados
+-- La consulta indica "todos" los eventos y por lo tanto utilizamos left join para incluir incluso 
+-- a los elementos que no tienen ingresos
+
+SELECT e.nombreEvento, u.nombreUbi, 
+       SUM(a.valoracion * e.precio_entrada) AS total_ingresos
+FROM evento e
+LEFT JOIN ubicacion u ON e.idUbicacion = u.idUbicacion
+LEFT JOIN asiste a ON e.idEvento = a.idEvento
+GROUP BY e.nombreEvento, u.nombreUbi;
+
+# 10. Consulta el nombre y apellidos de los asistentes cuyos teléfonos empiecen por 61
+SELECT a.nombreAs, a.apellidoAs, telefono1, telefono2
+FROM asistente a
+INNER JOIN telefono t ON a.idAsistente = t.idAsistente
+WHERE t.telefono1 LIKE '61%' OR t.telefono2 LIKE '61%';
